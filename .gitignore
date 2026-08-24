@@ -1,0 +1,23 @@
+# Ignore build and intermediate files
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+# Ignore user-specific settings
+*.log
+*.tmp
+*.vs
+vscode/
+*.suo
+*.user
+*.userosscache
+*.pdb
+# Ignore Unreal Engine-specific files
+*.uasset
+*.umap
+# Ignore backup and cache files
+Backup/
+cache/
+# Ignore system files
+DS_Store
+Thumbs.db
