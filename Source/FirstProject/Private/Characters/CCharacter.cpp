@@ -16,6 +16,17 @@ ACCharacter::ACCharacter()
 
 }
 
+void ACCharacter::ServerSideInit()
+{
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	AbilitySystemComponent->ApplyInitialEffects();
+}
+
+void ACCharacter::ClientSideInit()
+{
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+}
+
 // Called when the game starts or when spawned
 void ACCharacter::BeginPlay()
 {
