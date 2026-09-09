@@ -19,6 +19,9 @@ public:
 	
 	void ServerSideInit();
 	void ClientSideInit();
+	bool IsLocallyControlledByPlayer() const;
+	
+	virtual void PossessedBy(AController* NewController) override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,5 +46,13 @@ private:
 	
 	UPROPERTY()
 	class UCAttributeSet* CAttributeSet;
-
+	
+//--------------------------------------------------------------------//
+//								Game Ability					      //
+//--------------------------------------------------------------------//
+private:
+	UPROPERTY(VisibleDefaultsOnly, Category = "UI")
+	class UWidgetComponent* OverheadWidgetComponent;
+	
+	void ConfigureOverheadWidgetComponent();
 };

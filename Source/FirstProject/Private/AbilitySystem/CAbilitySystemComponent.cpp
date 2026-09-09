@@ -14,3 +14,14 @@ void UCAbilitySystemComponent::ApplyInitialEffects()
 		ApplyGameplayEffectSpecToSelf(*EffectSpec.Data);
 	}
 }
+
+void UCAbilitySystemComponent::GiveInitialAbilities()
+{
+	if (!GetOwner() || !GetOwner()-> HasAuthority())
+		return;
+	
+	for (const TSubclassOf<UGameplayAbility>& InitialAbility : InitialAbilities)
+	{
+		GiveAbility(FGameplayAbilitySpec(InitialAbility, 1, -1 ));
+	}
+}

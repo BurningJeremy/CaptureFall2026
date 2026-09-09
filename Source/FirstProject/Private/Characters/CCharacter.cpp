@@ -4,6 +4,9 @@
 #include "Characters/CCharacter.h"
 #include "AbilitySystem/CAbilitySystemComponent.h"
 #include "AbilitySystem/CAttributeSet.h"
+#include "Components/WidgetComponent.h"
+#include "Widgets/OverheadStatusGauge.h"
+#include "CPlayerController.generated.h"
 
 // Sets default values
 ACCharacter::ACCharacter()
@@ -14,12 +17,15 @@ ACCharacter::ACCharacter()
 	AbilitySystemComponent = CreateDefaultSubobject<UCAbilitySystemComponent>("AbilitySystemComponent");
 	CAttributeSet = CreateDefaultSubobject<UCAttributeSet>("CAttributeSet");
 
+	OverheadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("Overhead Widget Component");
+	OverheadWidgetComponent-> SetupAttachment(GetRootComponent());
 }
 
 void ACCharacter::ServerSideInit()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	AbilitySystemComponent->ApplyInitialEffects();
+	AbilitySystemComponent->GiveInitialAbilities();
 }
 
 void ACCharacter::ClientSideInit()
@@ -27,11 +33,12 @@ void ACCharacter::ClientSideInit()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
+
 // Called when the game starts or when spawned
 void ACCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	ConfigureOverheadWidgetComponent();
 }
 
 // Called every frame
@@ -51,5 +58,41 @@ void ACCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 UAbilitySystemComponent* ACCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void ACCharacter::ConfigureOverheadWidgetComponent()
+{
+	if (!OverheadWidgetComponent)
+	{
+		return;
+	}
+	
+	if (IsLocallyControlledByPlayer())
+	{
+		OverheadWidgetComponent->SetHiddenInGame(true);
+		return;
+	}
+	
+	UOverheadStatusGauge* OverheadStatusGauge = Cast<UOverheadStatusGauge>(OverheadWidgetComponent->GetUserWidgetObject());
+	if (OverheadStatusGauge)
+	{
+		OverheadStatusGauge->ConfigureWithAbilitySystemComponent(GetAbilitySystemComponent());
+	}
+	OverheadWidgetComponent->SetHiddenInGame(false);
+}
+
+
+bool ACCharacter::IsLocallyControlledByPlayer() const
+{
+	return IsLocallyControlled() && GetController()->IsPlayerController();
+}
+
+void ACCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	if (NewController && !NewController->IsPlayerController())
+	{
+		ServerSideInit();
+	}
 }
 
