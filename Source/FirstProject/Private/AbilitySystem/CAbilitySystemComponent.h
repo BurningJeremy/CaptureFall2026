@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/CAbilityInputID.h"
 #include "CAbilitySystemComponent.generated.h"
 
 /**
@@ -14,6 +15,8 @@ class UCAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
 public:
+	UCAbilitySystemComponent();
+	
 	void ApplyInitialEffects();
 	void GiveInitialAbilities();
 private:
@@ -21,5 +24,10 @@ private:
 	TArray<TSubclassOf<UGameplayEffect>> InitialEffects;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Effect")
-	TArray<TSubclassOf<UGameplayAbility>> InitialAbilities;
+	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> InitialAbilities;
+
+	void HealthChanged (const struct FOnAttributeChangeData& ChangeData);
+	
+	UPROPERTY(EditDefaultsOnly, Category = "GameplayEffect")
+	TSubclassOf<UGameplayEffect> DeathEffect;
 };

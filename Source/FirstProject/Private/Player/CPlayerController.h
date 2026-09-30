@@ -31,5 +31,6 @@ private:
 	UPROPERTY()
 	UGameplayWidget* GameplayWidget;
 	
-	void SpawnGameplayWidget();
+	void 
+	SpawnGameplayWidget();
 };
