@@ -10,6 +10,7 @@
 #include "AbilitySystem/CAbilitySystemNativeTags.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayTagsManager.h"
+#include "GenericTeamAgentInterface.h"
 
 UGA_Combo::UGA_Combo()
 {
@@ -17,6 +18,7 @@ UGA_Combo::UGA_Combo()
 	
 	SetAssetTags(FGameplayTagContainer(TAG_ABILITY_BASICATTACK));
 	BlockAbilitiesWithTag.AddTag(TAG_ABILITY_BASICATTACK);
+	
 }
 
 void UGA_Combo::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -99,26 +101,26 @@ void UGA_Combo::HandleComboInputPress(float TimeWaited)
 
 void UGA_Combo::DoDamage(FGameplayEventData EventData)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Trying to do Damage"))
-	TArray<FHitResult> HitResults = GetHitResultsFromSweepLocationTargetData(EventData.TargetData, 30.f, true);
-	for (const FHitResult& HitResult : HitResults)
-	{
-		TSubclassOf<UGameplayEffect> DamageEffect = GetDamageEffectForCurrentCombo();
+		UE_LOG(LogTemp, Warning, TEXT("Trying to do Damage"))
+		TArray<FHitResult> HitResults = GetHitResultsFromSweepLocationTargetData(EventData.TargetData, 30.f, true);
+		for (const FHitResult& HitResult : HitResults)
+		{
+			TSubclassOf<UGameplayEffect> DamageEffect = GetDamageEffectForCurrentCombo();
 		
-		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffect, GetAbilityLevel(GetCurrentAbilitySpecHandle(),GetCurrentActorInfo()));
+			FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffect, GetAbilityLevel(GetCurrentAbilitySpecHandle(),GetCurrentActorInfo()));
 		
-		FGameplayEffectContextHandle EffectContextHandle = MakeEffectContext(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
-		EffectContextHandle.AddHitResult(HitResult);
-		EffectSpecHandle.Data->SetContext(EffectContextHandle);
+			FGameplayEffectContextHandle EffectContextHandle = MakeEffectContext(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
+			EffectContextHandle.AddHitResult(HitResult);
+			EffectSpecHandle.Data->SetContext(EffectContextHandle);
 		
-		ApplyGameplayEffectSpecToTarget(
-			GetCurrentAbilitySpecHandle(),
-			GetCurrentActorInfo(),
-			GetCurrentActivationInfo(),
-			EffectSpecHandle,
-			UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor())
-			);
-	}
+			ApplyGameplayEffectSpecToTarget(
+				GetCurrentAbilitySpecHandle(),
+				GetCurrentActorInfo(),
+				GetCurrentActivationInfo(),
+				EffectSpecHandle,
+				UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor())
+				);
+		}
 }
 
 TSubclassOf<class UGameplayEffect> UGA_Combo::GetDamageEffectForCurrentCombo() const

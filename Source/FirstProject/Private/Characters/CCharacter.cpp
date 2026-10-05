@@ -12,6 +12,14 @@
 #include "FirstProject/FirstProject.h"
 #include "Widgets/OverheadStatusGauge.h"
 #include "GameFramework/CharactermovementComponent.h"
+#include "Player/CPlayerController.h"
+#include "Net/UnrealNetwork.h"
+
+void ACCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACCharacter, TeamId);
+}
 
 
 // Sets default values
@@ -35,6 +43,7 @@ void ACCharacter::ServerSideInit()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	AbilitySystemComponent->ApplyInitialEffects();
 	AbilitySystemComponent->GiveInitialAbilities();
+	
 }
 
 void ACCharacter::ClientSideInit()
@@ -75,6 +84,10 @@ void ACCharacter::DeathTagUpdated(const FGameplayTag Tag, int32 Count)
 	}
 	else
 	{
+		
+		GetMesh()->SetSimulatePhysics(false);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
 		Respawn();
 	}
 }
@@ -110,24 +123,61 @@ void ACCharacter::StartDeathSequence()
 void ACCharacter::Respawn()
 {
 	StopAnimMontage(DeathMontage);
+	SetRagdollEnabled(false);
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	
-	
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	APlayerController* PlayerController = GetController<APlayerController>();
 	if (PlayerController)
 	{
 		EnableInput(PlayerController);
 	}
-	`
 	CAttributeSet->SetHealth(CAttributeSet->GetMaxHealth());
+	StopAnimMontage(DeathMontage);
+	if (HasAuthority() && GetController()->StartSpot.IsValid())
+	{
+	SetActorTransform(GetController()->StartSpot->GetActorTransform());
+	}
+	
+}
+
+bool ACCharacter::bIsDead() const
+{
+	return AbilitySystemComponent->HasMatchingGameplayTag(TAG_STAT_DEAD);
+}
+
+void ACCharacter::SetRagdollEnabled(bool bIsEnabled)
+{
+	if (bIsEnabled)
+	{	SkeletalMeshRelativeTransform = GetMesh()->GetRelativeTransform();
+		GetMesh()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		GetMesh()->SetSimulatePhysics(true);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	}
+	else
+	{
+		GetMesh()->SetSimulatePhysics(false);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		GetMesh()->SetRelativeTransform(SkeletalMeshRelativeTransform);
+	}
+	
 }
 
 void ACCharacter::PlayDeathMontage()
 {
 	if (DeathMontage)
 	{
-		PlayAnimMontage(DeathMontage);
+		float DeathAnimationDuration = PlayAnimMontage(DeathMontage);
+		GetWorldTimerManager().SetTimer(DeathAnimationTimerHandle, this, &ACCharacter::DeathAnimationFinished, DeathAnimationDuration - DeathAnimationTimeOffset);
+	}
+}
+
+void ACCharacter::DeathAnimationFinished()
+{
+	if (bIsDead())
+	{
+		SetRagdollEnabled(true);
 	}
 }
 
@@ -150,6 +200,16 @@ void ACCharacter::ConfigureOverheadWidgetComponent()
 		OverheadStatusGauge->ConfigureWithAbilitySystemComponent(GetAbilitySystemComponent());
 	}
 	OverheadWidgetComponent->SetHiddenInGame(false);
+}
+
+void ACCharacter::SetGenericTeamID(const FGenericTeamId& NewTeamID)
+{
+	TeamId = NewTeamID;
+}
+
+FGenericTeamId ACCharacter::GetGenericTeamId() const
+{
+	return TeamId;
 }
 
 
