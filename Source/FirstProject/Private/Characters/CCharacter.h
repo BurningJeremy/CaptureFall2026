@@ -92,9 +92,9 @@ private:
 	
 	void ConfigureOverheadWidgetComponent();
 public:
-	virtual void SetGenericTeamID(const FGenericTeamId& NewTeamID);
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 	
-	virtual FGenericTeamId GetGenericTeamId() const;
+	virtual FGenericTeamId GetGenericTeamId() const override;
 	
 private:
 	UPROPERTY(Replicated)

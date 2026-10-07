@@ -202,7 +202,7 @@ void ACCharacter::ConfigureOverheadWidgetComponent()
 	OverheadWidgetComponent->SetHiddenInGame(false);
 }
 
-void ACCharacter::SetGenericTeamID(const FGenericTeamId& NewTeamID)
+void ACCharacter::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 {
 	TeamId = NewTeamID;
 }

@@ -11,7 +11,7 @@
  * 
  */
 UCLASS()
-class ACPlayerController : public APlayerController
+class ACPlayerController : public APlayerController, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 	
@@ -37,7 +37,7 @@ private:
 	void SpawnGameplayWidget(); 
 	
 public:
-	virtual void SetGenericTeamID(const FGenericTeamId& NewTeamID);
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 	
 	virtual FGenericTeamId GetGenericTeamId() const;
 	

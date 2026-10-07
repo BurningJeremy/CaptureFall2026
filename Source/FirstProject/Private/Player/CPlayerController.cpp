@@ -50,7 +50,7 @@ void ACPlayerController::SpawnGameplayWidget()
 	}
 }
 
-void ACPlayerController::SetGenericTeamID(const FGenericTeamId& NewTeamID)
+void ACPlayerController::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 {
 	TeamId = NewTeamID;
 }
