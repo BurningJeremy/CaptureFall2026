@@ -62,10 +62,12 @@ private:
 	//--------------------------------------------------------------------//
 	//								Death & Respawn					      //
 	//--------------------------------------------------------------------//
+public:
+	bool bIsDead() const;
 private:
 	void StartDeathSequence();
 	void Respawn();
-	bool bIsDead() const;
+	
 	
 	FTransform SkeletalMeshRelativeTransform;
 	
@@ -91,6 +93,10 @@ private:
 	class UWidgetComponent* OverheadWidgetComponent;
 	
 	void ConfigureOverheadWidgetComponent();
+	
+	//--------------------------------------------------------------------//
+	//								Team							      //
+	//--------------------------------------------------------------------//
 public:
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 	
@@ -99,5 +105,15 @@ public:
 private:
 	UPROPERTY(Replicated)
 	FGenericTeamId TeamId;
+	
+	//--------------------------------------------------------------------//
+	//						AI Perception							      //
+	//--------------------------------------------------------------------//
+	
+private:
+	UPROPERTY()
+	class UAIPerceptionStimuliSourceComponent* AIPerceptionStimuliSourceComponent;
+	
+	void SetAIPerceptionStimuliSourceEnabled(bool bIsStimuliSourceEnabled);
 
 };
