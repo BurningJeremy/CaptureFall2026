@@ -6,6 +6,9 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+
+#include "Components/StateTreeAIComponent.h"
+
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/CAbilitySystemNativeTags.h"
@@ -28,6 +31,7 @@ ACAIController::ACAIController()
 	SightConfig->PeripheralVisionAngleDegrees = 180.0f;
 	
 	AIPerceptionComponent->ConfigureSense(*SightConfig);
+	StateTreeComponent = CreateDefaultSubobject<UStateTreeAIComponent>("State Tree AI Component");
 }
 
 void ACAIController::OnPossess(APawn* NewPawn)
@@ -45,9 +49,6 @@ void ACAIController::OnPossess(APawn* NewPawn)
 
 void ACAIController::BeginPlay()
 {
-	Super::BeginPlay();
-	RunBehaviorTree(BehaviorTree);
-	
 	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ACAIController::TargetPerceptionUpdated);
 	AIPerceptionComponent->OnTargetPerceptionForgotten.AddDynamic(this, &ACAIController::TargetForgotten);
 	
@@ -96,11 +97,16 @@ UObject* ACAIController::GetCurrentTarget() const
 		return BlackboardComponent->GetValueAsObject(BlackboardTargetKeyName);
 	}
 	
-	return nullptr;
+	return CurrentTarget;
 }
 
 void ACAIController::SetCurrentTarget(AActor* NewTarget)
 {
+	if (NewTarget != CurrentTarget)
+	{
+		CurrentTarget = NewTarget;
+		StateTreeComponent->SendStateTreeEvent(TAG_PERCEPTION_TARGET_CHANGE);
+	}
 	if (UBlackboardComponent* BlackboardComponent = GetBlackboardComponent())
 	{
 		if (NewTarget)
