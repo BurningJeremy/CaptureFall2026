@@ -18,7 +18,6 @@ UGA_Combo::UGA_Combo()
 	
 	SetAssetTags(FGameplayTagContainer(TAG_ABILITY_BASICATTACK));
 	BlockAbilitiesWithTag.AddTag(TAG_ABILITY_BASICATTACK);
-	
 }
 
 void UGA_Combo::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -29,6 +28,8 @@ void UGA_Combo::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		return;
 	}
+	
+	NextComboName = NAME_None;
 	
 	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{

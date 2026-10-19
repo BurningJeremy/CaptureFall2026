@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "GameplayTagContainer.h"
 #include "CAnimInstance.generated.h"
 
 /**
@@ -17,6 +18,9 @@ class UCAnimInstance : public UAnimInstance
 public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+	
+	UFUNCTION(BlueprintCallable, meta=(BlueprintThreadSafe))
+	FORCEINLINE bool ShouldDoFullBody() const {return !IsMoving() && !bIsAiming;}
 	
 	UFUNCTION(BlueprintCallable, meta=(BlueprintThreadSafe))
 	FORCEINLINE bool IsMoving() const { return Speed > 0;}
@@ -52,6 +56,15 @@ private:
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess))
 	float SmoothedYawSpeed;
 	
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess))
+	bool bIsAiming;
+	
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess))
+	float ForwardSpeed;
+	
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess))
+	float RightSpeed;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Animaiton")
 	float YawSpeedSmoothLerpRate = 2.f;
 	
@@ -59,4 +72,6 @@ private:
 	
 	UPROPERTY()
 	FRotator LookRotationOffset;
+	
+	void AimTagUpdated(const FGameplayTag Tag, int32 NewCount);
 };

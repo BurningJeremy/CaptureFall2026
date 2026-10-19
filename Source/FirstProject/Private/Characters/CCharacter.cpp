@@ -82,6 +82,7 @@ void ACCharacter::BindGASDelegates()
 	bGASDelegateBound = true;
 	
 	AbilitySystemComponent->RegisterGameplayTagEvent(TAG_STAT_DEAD).AddUObject(this, &ACCharacter::DeathTagUpdated);
+	AbilitySystemComponent->RegisterGameplayTagEvent(TAG_STAT_AIMING).AddUObject(this, &ACCharacter::AimTagUpdated);
 }
 
 void ACCharacter::DeathTagUpdated(const FGameplayTag Tag, int32 Count)
@@ -98,6 +99,17 @@ void ACCharacter::DeathTagUpdated(const FGameplayTag Tag, int32 Count)
 		
 		Respawn();
 	}
+}
+
+void ACCharacter::AimTagUpdated(const FGameplayTag Tag, int32 Count)
+{
+	SetIsAiming(Count != 0);
+}
+
+void ACCharacter::SetIsAiming(bool bIsAiming)
+{
+	bUseControllerRotationYaw = bIsAiming;
+	GetCharacterMovement()->bOrientRotationToMovement = !bIsAiming;
 }
 
 // Called to bind functionality to input

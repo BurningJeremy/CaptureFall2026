@@ -14,6 +14,8 @@ class UCGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 	
+public:
+	UCGameplayAbility();
 protected:
 	TArray<FHitResult> GetHitResultsFromSweepLocationTargetData(const FGameplayAbilityTargetDataHandle& TargetDataHandle, float SphereSweepRadius = 30.f,
 		bool bDrawDebug = false, bool bIgnoreSelf = true) const;

@@ -5,6 +5,11 @@
 
 #include "Kismet/KismetSystemLibrary.h"
 
+UCGameplayAbility::UCGameplayAbility()
+{
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+}
+
 TArray<FHitResult> UCGameplayAbility::GetHitResultsFromSweepLocationTargetData(
 	const FGameplayAbilityTargetDataHandle& TargetDataHandle, float SphereSweepRadius, bool bDrawDebug,
 	bool bIgnoreSelf) const
