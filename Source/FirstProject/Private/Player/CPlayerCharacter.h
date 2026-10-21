@@ -53,4 +53,22 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* MoveInputAction;
+	
+	//--------------------------------------------------------------------------------------------//
+	//										Camera												  //
+	//--------------------------------------------------------------------------------------------//
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "View")
+	FVector CameraAimLocationOffset;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "View")
+	float CameraLerpSpeed = 20.0f;
+	
+	FTimerHandle CameraLerpTimerHandle;
+	
+	void LerpCameraToLocalOffsetLocation(const FVector& Goal);	
+	void TickCameraLocationOffsetLerp(FVector Goal);
+	
+	virtual void OnAimStatChanged(bool bNewIsAiming) override;
 };

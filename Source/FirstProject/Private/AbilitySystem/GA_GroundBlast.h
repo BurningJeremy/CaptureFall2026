@@ -20,4 +20,15 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* CastMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
+	TSubclassOf<class ATA_GroundPick> TargetActorClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Effect")
+	TSubclassOf<class UGameplayEffect> DamageEffect;
+	UFUNCTION()
+	void TargetConfirmed(const FGameplayAbilityTargetDataHandle& TargetDatahandle);
+	
+	UFUNCTION()
+	void TargetCancelled(const FGameplayAbilityTargetDataHandle& TargetDatahandle);
 };

@@ -5,3 +5,4 @@
 #include "CoreMinimal.h"
 
 #define ECC_CameraBoom ECC_GameTraceChannel1
+#define ECC_Target ECC_GameTraceChannel2

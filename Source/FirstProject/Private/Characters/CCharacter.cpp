@@ -39,7 +39,9 @@ ACCharacter::ACCharacter()
 	OverheadWidgetComponent-> SetupAttachment(GetRootComponent());
 	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_CameraBoom, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Target, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_CameraBoom, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Target, ECR_Ignore);
 	
 	AIPerceptionStimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>("AI perception Stimuli Source Component");
 }
@@ -110,6 +112,12 @@ void ACCharacter::SetIsAiming(bool bIsAiming)
 {
 	bUseControllerRotationYaw = bIsAiming;
 	GetCharacterMovement()->bOrientRotationToMovement = !bIsAiming;
+	OnAimStatChanged(bIsAiming);
+}
+
+void ACCharacter::OnAimStatChanged(bool bNewIsAiming)
+{
+	
 }
 
 // Called to bind functionality to input

@@ -4,9 +4,13 @@
 #include "AbilitySystem/CAbilitySystemComponent.h"
 #include "AbilitySystem/CAttributeSet.h"
 
+
 UCAbilitySystemComponent::UCAbilitySystemComponent()
 {
 	GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetHealthAttribute()).AddUObject(this,&UCAbilitySystemComponent::HealthChanged);
+	
+	GenericConfirmInputID = (int32)ECAbilityInputID::Confirm;
+	GenericCancelInputID = (int32)ECAbilityInputID::Cancel;
 }
 
 void UCAbilitySystemComponent::ApplyInitialEffects()

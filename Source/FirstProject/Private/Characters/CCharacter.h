@@ -52,6 +52,7 @@ private:
 	void DeathTagUpdated(const FGameplayTag Tag, int32 Count);
 	void AimTagUpdated(const FGameplayTag Tag, int32 Count);
 	void SetIsAiming(bool bIsAiming);
+	virtual void OnAimStatChanged(bool bNewIsAiming);
 	
 	bool bGASDelegateBound;
 	
