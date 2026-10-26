@@ -5,11 +5,15 @@
 #include "FirstProject/FirstProject.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Abilities/GameplayAbility.h"
+#include "Components/DecalComponent.h"
 #include "Engine/OverlapResult.h"
 
 ATA_GroundPick::ATA_GroundPick()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	SetRootComponent(CreateDefaultSubobject<USceneComponent>("RootComp"));
+	DecalComponent = CreateDefaultSubobject<UDecalComponent>("DecalComponent");
+	DecalComponent->SetupAttachment(GetRootComponent());
 }
 
 void ATA_GroundPick::ConfirmTargetingAndContinue()
@@ -48,7 +52,35 @@ void ATA_GroundPick::ConfirmTargetingAndContinue()
 	}
 
 	FGameplayAbilityTargetDataHandle TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActorArray(TargetActors.Array(), false);
+	
+	FGameplayAbilityTargetData_SingleTargetHit* HitLoc = new FGameplayAbilityTargetData_SingleTargetHit;
+	HitLoc->HitResult.ImpactPoint = GetActorLocation();
+	HitLoc->HitResult.ImpactNormal = FVector::UpVector;
+	
+	TargetData.Add(HitLoc);
+	
 	TargetDataReadyDelegate.Broadcast(TargetData);
+}
+
+void ATA_GroundPick::SetTargetAreaRadius(float NewTargetAreaRadius)
+{
+	TargetAreaRadius = NewTargetAreaRadius;
+	DecalComponent->DecalSize = FVector{TargetAreaRadius};
+}
+
+void ATA_GroundPick::SetTargetAreaRange(float NewTargetAreaRange)
+{
+	TargetTraceRange = NewTargetAreaRange;
+}
+
+void ATA_GroundPick::SetShouldDrawDebug(bool bNewShouldDrawDebug)
+{
+	bShouldDrawDebug = bNewShouldDrawDebug;
+}
+
+void ATA_GroundPick::AddTargetTeamAttitude(ETeamAttitude::Type NewAttitude)
+{
+	TargetTeamAttitudes.Add(NewAttitude);
 }
 
 void ATA_GroundPick::Tick(float DeltaSeconds)

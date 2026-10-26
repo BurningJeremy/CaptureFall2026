@@ -7,6 +7,7 @@
 #include "AbilitySystem/CAbilitySystemNativeTags.h"
 #include "AbilitySystem/TA_GroundPick.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 
 UGA_GroundBlast::UGA_GroundBlast()
 {
@@ -37,9 +38,18 @@ void UGA_GroundBlast::ActivateAbility(const FGameplayAbilitySpecHandle Handle,co
 	WaitTargetData->Cancelled.AddDynamic(this, &UGA_GroundBlast::TargetCancelled);
 	WaitTargetData->ReadyForActivation();
 	
+	
 	AGameplayAbilityTargetActor* TargetActor = nullptr;
 	
 	WaitTargetData->BeginSpawningActor(this, TargetActorClass, TargetActor);
+	ATA_GroundPick* GroundPickActor = Cast<ATA_GroundPick>(TargetActor);
+	if (GroundPickActor)
+	{
+		GroundPickActor->SetTargetAreaRadius(TargetAreaRadius);
+		GroundPickActor->SetTargetAreaRange(TargetTraceRange);
+		GroundPickActor->AddTargetTeamAttitude(ETeamAttitude::Hostile);
+		GroundPickActor->SetShouldDrawDebug(bShouldDrawDebug);
+	}
 	WaitTargetData->FinishSpawningActor(this, TargetActor);
 }
 
@@ -52,7 +62,19 @@ void UGA_GroundBlast::TargetConfirmed(const FGameplayAbilityTargetDataHandle& Ta
 	//}
 	if (K2_CommitAbility())
 	{
-		BP_ApplyGameplayEffectToTarget(TargetDatahandle, DamageEffect);
+		//BP_ApplyGameplayEffectToTarget(TargetDatahandle, DamageEffect);
+		
+		FGameplayEffectSpecHandle StunEffectSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffect, GetAbilityLevel(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()));
+		StunEffectSpecHandle.Data->SetSetByCallerMagnitude(TAG_STAT_STUN, StunDuration);
+		ApplyGameplayEffectSpecToTarget(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), StunEffectSpecHandle, TargetDatahandle);
+		
+		FGameplayCueParameters BlastingGameplayCueParams;
+		BlastingGameplayCueParams.EffectContext = MakeEffectContext(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
+		BlastingGameplayCueParams.EffectContext.AddHitResult(UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDatahandle, 1));
+		for (const FGameplayTag& GameplayCueTag : BlastingGameplayCueTags)
+		{
+			GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(GameplayCueTag, BlastingGameplayCueParams);
+		}
 	}
 	
 	UGA_GroundBlast::K2_EndAbility();

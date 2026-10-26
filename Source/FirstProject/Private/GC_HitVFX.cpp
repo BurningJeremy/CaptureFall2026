@@ -14,7 +14,8 @@ bool UGC_HitVFX::OnExecute_Implementation(AActor* MyTarget, const FGameplayCuePa
 	const FHitResult* HitResult = Parameters.EffectContext.GetHitResult();
 	if (HitResult)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), VFX, HitResult->ImpactPoint, UKismetMathLibrary::MakeRotFromX(HitResult->ImpactNormal));
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), VFX, HitResult->ImpactPoint, UKismetMathLibrary::MakeRotFromX(HitResult->ImpactNormal), FVector{VFXScale});
 	}
+	
 	return true;
 }

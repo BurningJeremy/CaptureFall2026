@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "GameplayTagContainer.h"
 #include "CAIController.generated.h"
 
 struct FAIStimulus;
@@ -59,4 +60,11 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, meta=(AllowPrivateAccess="true"))
 	AActor* CurrentTarget;
+	
+	void ClearAndDisableAllSenses();
+	void EnableAllSenses();
+	void PawnDeathTagUpdated(const FGameplayTag Tag, int32 NewCount);
+	void PawnStunTagUpdated(const FGameplayTag Tag, int32 NewCount);
+	
+	bool bCachedIsPawnDead;
 };
